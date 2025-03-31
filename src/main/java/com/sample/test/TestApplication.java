@@ -1,11 +1,15 @@
 package com.sample.test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,6 +22,8 @@ import com.sample.test.entity.Employees;
 import com.sample.test.factory.AndroidDeveloperFactory;
 import com.sample.test.factory.EmployeeFactory;
 import com.sample.test.factory.WebDeveloperFactory;
+import com.sample.test.serviceImpl.Problems;
+import com.sample.test.util.StreamTest;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -29,39 +35,122 @@ public class TestApplication {
 
 	public static void main(String[] args) {
 		final ConfigurableApplicationContext context = SpringApplication.run(TestApplication.class, args);
+		Problems prob = (Problems) context.getBean("problems");
+
+		int[] nums = { 0, 1, 0, 3, 12 };
+		int count1 = 0;
+		for (int i = 0; i < nums.length - 1 - count1; i++) {
+			if (nums[i] == 0) {
+				int temp = nums[i];
+				nums[i] = nums[nums.length - 1 - count1];
+				nums[nums.length - 1 - count1] = temp;
+				count1++;
+			}
+		}
+		int newLength = nums.length - count1;
+		for (int i = 0; i <= newLength - 1; i++) {
+			for (int j = i + 1; j <= newLength - 1; j++) {
+				if (nums[i] > nums[j]) {
+					int temp = nums[i];
+					nums[i] = nums[j];
+					nums[j] = temp;
+				}
+			}
+		}
 
 		Address y = new Address();
 		System.out.println(y.counter); // L5.
-		//Factory call from the client 
-		Employees emp =  EmployeeFactory.getEmployee("Android Developer");
+		// Factory call from the client
+		Employees emp = EmployeeFactory.getEmployee("Android Developer");
 		emp.getSalary();
-		Employees emp1 =  EmployeeFactory.getEmployee("Web Developer");
+		Employees emp1 = EmployeeFactory.getEmployee("Web Developer");
 		emp1.getSalary();
-		//AbstractFactory Client;
+		// AbstractFactory Client;
 		Employees e3 = EmployeeFactory.getEmployees(new AndroidDeveloperFactory());
 		e3.getSalary();
 
 		Employees e4 = EmployeeFactory.getEmployees(new WebDeveloperFactory());
 		e4.getSalary();
+		int[] prod = { -2, 3, -4 };
+		prob.maxProduct(prod);
 
-		/*
-		 * final AtomicInteger counter = new AtomicInteger(0); System.out.println(
-		 * "**************** START: Total Bean Objects:  ******************" +
-		 * context.getBeanDefinitionCount());
-		 * 
-		 * Arrays.asList(context.getBeanDefinitionNames()).forEach(beanName -> {
-		 * System.out.println("{} Bean Name: {} " + counter.incrementAndGet() + " " +
-		 * beanName); });
-		 * 
-		 * StreamTest streamService = (StreamTest) context.getBean("streamTest");
-		 * streamService.streamKT();
-		 * 
-		 * int[] arrQuick = { 6, 2, 8, 9, 3 }; streamService.quickSort(arrQuick, 0,
-		 * arrQuick.length - 1);
-		 * 
-		 * int power = streamService.powerSumRec(2, 10); System.out.println("Power" +
-		 * power);
-		 */
+		int[] numsb2 = { 4, 4, 1, 3, 1, 3, 2, 2, 5, 5, 1, 5, 2, 1, 2, 3, 5, 4 };
+		int nx = numsb2.length;
+		int index = 0;
+		int result = 0;
+		while (index < nx) {
+			for (int i = index + 1; i < nx; i++) {
+				if(numsb2[i]!=0 &&  numsb2[index]!=0)
+					if (numsb2[i] + numsb2[index] == 2) {
+						result++;
+						numsb2[i] = 0;
+						numsb2[index] = 0;
+					}
+			}
+			index++;
+		}
+		 String s="the  sky is   blue  ";
+		 String [] str = s.trim().replaceAll("\\s+", " ").split(" ");
+		 List<String> stList = Arrays.asList(str);
+		 //stList.stream().filter();
+		 String [] revrsStr = new String[str.length];
+	        for(int i=str.length-1; i>=0;i--)
+	        {
+	            revrsStr[i]=str[str.length-1-i];
+	        }
+	        String reverse="";
+	        for(String s1 :  revrsStr)
+	        {
+	        	reverse= reverse +"\s"+s1;	
+	        }
+	        List<Integer> list= Arrays.stream(nums).boxed().toList();     
+
+	        int [] numbers= {4,0,4,3,3};
+	        double avgMax= IntStream.range(0, numbers.length - 4 + 1)
+	            .mapToDouble(i -> Arrays.stream(Arrays.copyOfRange(numbers, i, i + 4))
+	            		.average()
+	            		.orElse(0))
+	            	.max()
+	            	.orElse(0); 
+	        
+	        double maxAvg=0;
+	        double avg=0;
+	        for(int i=0;i<numbers.length;i++)
+	        {
+	        	int check=0;;
+	        	double total=0;
+	            for(int j=i;j<i+5;j++)
+	            {
+	                total= total+numbers[j];
+	                check= Math.abs(i-(numbers.length-1))+1;
+	                if (check==5)
+	                break;
+	            }
+	                avg=total/5;
+	                maxAvg= Math.max(avg,maxAvg);
+	             if (check==5)
+		               break;
+	        }
+	        
+		final AtomicInteger counter = new AtomicInteger(0);
+		System.out.println(
+				"**************** START: Total Bean Objects:  ******************" + context.getBeanDefinitionCount());
+
+		Arrays.asList(context.getBeanDefinitionNames()).forEach(beanName -> {
+			System.out.println("{} Bean Name: {} " + counter.incrementAndGet() + " " + beanName);
+		});
+
+		StreamTest streamService = (StreamTest) context.getBean("streamTest");
+		streamService.streamKT();
+
+		int[] arrQuick = { 6, 2, 8, 9, 3 };
+		streamService.quickSort(arrQuick, 0, arrQuick.length - 1);
+
+		int power = streamService.powerSumRec(2, 10);
+		System.out.println("Power" + power);
+
+		streamService.streamPart1();
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 		String ransomNote = "aa";
 
 		String magazine = "aab";
@@ -84,8 +173,7 @@ public class TestApplication {
 		for (Map.Entry<Character, Integer> magazine1 : magazineMap.entrySet()) {
 			char key = magazine1.getKey();
 			int value = magazine1.getValue();
-			if (ransomNoteMap.containsKey(key) &&
-					ransomNoteMap.get(key)<=value) {
+			if (ransomNoteMap.containsKey(key) && ransomNoteMap.get(key) <= value) {
 				count++;
 				System.out.println("True");
 			}
@@ -146,8 +234,8 @@ public class TestApplication {
 		if (!profitList.isEmpty())
 			profit = Collections.max(profitList);
 		System.out.println(profit);
-		String s = "[{}]{}[{]";
-		boolean isValid = isValidBrackets(s);
+		String st = "[{}]{}[{]";
+		boolean isValid = prob.isValidBrackets(st);
 		System.out.println("String status:" + isValid);
 		/*
 		 * String check = "pwddkew"; String maxSubString = getLongestSubString(check);
@@ -188,279 +276,20 @@ public class TestApplication {
 
 	}
 
-	static int getPermutation(int n, int r) {
-
-		int f1 = n;
-		int f2 = n - r;
-		for (int i = f1 - 1; i >= 1; i--) {
-			f1 = f1 * i;
-		}
-		for (int i = f2 - 1; i >= 1; i--) {
-			f2 = f2 * i;
-		}
-		int perm = f1 / f2;
-		return perm;
-	}
-
-	public static boolean isValidBrackets(String s) {
-		Stack<Character> st = new Stack<Character>();
-		for (int i = 0; i < s.length(); i++) {
-
-			// Check if the character is an opening bracket
-			if (s.charAt(i) == '(' || s.charAt(i) == '{' || s.charAt(i) == '[') {
-				st.push(s.charAt(i));
-			} else {
-
-				// If it's a closing bracket, check if the stack is non-empty
-				// and if the top of the stack is a matching opening bracket
-				if (!st.empty() &&
-						((st.peek() == '(' && s.charAt(i) == ')') ||
-								(st.peek() == '{' && s.charAt(i) == '}') ||
-								(st.peek() == '[' && s.charAt(i) == ']'))) {
-					st.pop();
-				} else {
-
-					// Unmatched closing bracket
-					return false;
-				}
-			}
-
-		}
-		return st.empty();
-	}
-
-	static void findPermutation(int number) {
-		int temp = number, count = 0;
-		// iteration over the specified digit
-		while (temp > 0) {
-			// increments the count variable by 1 i the above condition returns true
-			count++;
-			// divides the variable temp by 10
-			temp = temp / 10;
-		}
-		// using vector to print the permutation of N
-		int[] num = new int[count];
-		// Store digits of N
-		// in the vector num
-		while (number > 0) {
-			// finds the remainder and store the digit in vector num
-			num[count-- - 1] = number % 10;
-			number = number / 10;
-		}
-		// iterate over each permutation and find the permutations that are greater than
-		// N
-		while (findsNextpermutation(num)) {
-
-			for (int i = 0; i < num.length; i++)
-				// print all the permutations of N
-				System.out.print(num[i]);
-			// throw the cursor to the new line
-			System.out.print("\n");
-		}
-	}
-
-	// the user-defined function finds all the permutation greater than the number
-	// itself
-	static boolean findsNextpermutation(int[] p) {// 3
-		for (int a = p.length - 2; a >= 0; --a)
-			if (p[a] < p[a + 1])
-				for (int b = p.length - 1;; --b)
-					if (p[b] > p[a]) {
-						// swapping logic
-						int t = p[a];
-						p[a] = p[b];
-						p[b] = t;
-						for (++a, b = p.length - 1; a < b; ++a, --b) {
-							// swapping logic
-							t = p[a];
-							p[a] = p[b];
-							p[b] = t;
-						}
-						return true;
-					}
-		return false;
-	}
-
-	static int findMin(int[] arr) {
-		int res = 0;
-		int min = arr[0];
-		// Traverse over arr[] to find minimum element
-		for (int i = 0; i < arr.length - 1; i++) {
-			// res = Math.min(res, arr[i]);
-			if (arr[i] < min) {
-				min = arr[i];
-				res = i;
+	public int maxArea(int[] height) {
+		int n = height.length;
+		int maxVolume = 0;
+		int vol = 1;
+		int min = 0;
+		for (int i = 0; i < n; i++) {
+			for (int j = i + 1; j < n; j++) {
+				min = Math.min(height[i], height[j]);
+				vol = min * Math.abs(i - j);
+				if (vol > maxVolume)
+					maxVolume = vol;
 			}
 		}
-		return res;
-
+		return maxVolume;
 	}
 
-	static int findRotateIndex(int[] arr, int target) {
-
-		int minIndex = findMin(arr);// 3
-		// {1,6,7,2,3,4,6,5,9}
-		// start- minIdex, minIndex_, high
-		// int minFirst = arr[0];
-		for (int i = 0; i < minIndex; i++) {
-			for (int j = i + 1; j < minIndex; j++) {
-
-				if (arr[j] < arr[i]) {
-					int tem = arr[i];
-					arr[i] = arr[j];
-					arr[j] = tem;
-				}
-			}
-		} // {1,6,7,2,3,4,6,5,9}
-		for (int i = minIndex; i < arr.length; i++) {
-			for (int j = i + 1; j < arr.length; j++) {
-
-				if (arr[j] < arr[i]) {
-					int tem = arr[i];
-					arr[i] = arr[j];
-					arr[j] = tem;
-				}
-			}
-		}
-		int count = 0;
-		int value = -1;
-		int[] arrTemp = new int[arr.length];
-
-		for (int i = minIndex; i < arr.length; i++, count++) {
-			arrTemp[count] = arr[i];
-			if (arrTemp[count] == target)
-				value = count;
-
-		}
-		for (int i = 0; i < minIndex; i++, count++) {
-			arrTemp[count] = arr[i];
-			if (arrTemp[count] == target)
-				value = count;
-		}
-		System.out.println("value" + value);
-		return value;
-	}
-
-	public static void generateCombinations(int[] nums, int combinationSize, int start, List<Integer> current,
-			List<List<Integer>> result) {
-		// Base case: if the current combination size matches the desired size
-		if (current.size() == combinationSize) {
-			result.add(new ArrayList<>(current));
-			return;
-		}
-
-		// Recursive case: iterate through the numbers and generate combinations
-		for (int i = start; i < nums.length; i++) {
-			current.add(nums[i]);
-			generateCombinations(nums, combinationSize, i + 1, current, result);
-			current.remove(current.size() - 1); // Backtrack
-		}
-	}
-
-	public static int majorityElement(int[] nums) {
-		/// [0, 1, 2, 3, 4, 2, 2, 3, 3, 4]
-		Map<Integer, Integer> mapCount = new HashMap<>();
-		for (int i = 0; i < nums.length; i++) {
-			if (mapCount.containsKey(nums[i])) {
-				mapCount.put(nums[i], mapCount.get(nums[i]) + 1);
-			} else
-				mapCount.put(nums[i], 1);
-		}
-		int major = 0;
-		if (mapCount != null) {
-			for (Map.Entry<Integer, Integer> key : mapCount.entrySet()) {
-				if (key.getValue() >= (nums.length / 2) + 1) {
-					major = key.getKey();
-					System.out.println("Majority Number" + major);
-				} else
-					major = 0;
-			}
-		} else
-			return 0;
-		return major;
-	}
-
-	// pwddkew
-	public static String getLongestSubString(String str) {
-		Map<Character, Integer> charIndexMap = new HashMap<>();
-		int start = 0;
-		int maxLength = 0;
-		String maxSbString = null;
-		for (int i = 0; i < str.length(); i++) {
-			char currentChar = str.charAt(i);
-			if (charIndexMap.containsKey(currentChar) && charIndexMap.get(currentChar) >= start) {
-				start = charIndexMap.get(currentChar) + 1;
-			}
-
-			charIndexMap.put(currentChar, i);
-			int currentMaxLength = i - start + 1;
-
-			if (currentMaxLength > maxLength) {
-				maxLength = currentMaxLength;
-				maxSbString = str.substring(start, i + 1);
-			}
-		}
-
-		return maxSbString;
-
-	}
-
-	public static int[] twoSum(int[] nums, int target) {
-		int[] indexs = new int[2];
-		for (int i = 0; i <= nums.length - 1; i++) {
-			for (int j = i + 1; j <= nums.length - 1; j++) {
-				if (nums[i] + nums[j] == target) {
-					indexs[0] = i;
-					indexs[1] = j;
-				}
-			}
-		}
-		return indexs;
-	}
-
-	public static int removeDuplicates(int[] nums) {
-		int[] arr = new int[nums.length];
-		int j = 0;
-		for (int i = 0; i < nums.length - 1; i++) {
-			if (nums[i] != nums[i + 1]) {
-				arr[j++] = nums[i];
-			}
-		}
-		arr[j++] = nums[nums.length - 1];
-		for (int i = 0; i < j; i++) {
-			nums[i] = arr[i];
-		}
-		return j;
-	}
-
-	private static int MY_INT = 0;
-
-	static class ChangeListener extends Thread {
-		@Override
-		public void run() {
-			int local_value = MY_INT;
-			while (local_value < 5) {
-				if (local_value != MY_INT) {
-					log.info("Got Change for MY_INT : {0} {}", MY_INT);
-					local_value = MY_INT;
-				}
-			}
-		}
-	}
-
-	static class ChangeMaker extends Thread {
-		@Override
-		public void run() {
-			int local_value = MY_INT;
-			while (MY_INT < 5) {
-				log.info("Incrementing MY_INT to {0} {}", local_value + 1);
-				MY_INT = ++local_value;
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
 }

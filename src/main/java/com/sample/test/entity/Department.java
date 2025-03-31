@@ -28,8 +28,10 @@ public class Department {
 	private Long departmentId; // Unique identifier for the department.
 	private String departmentName; // Name of the department.
 	private String departmentAddress; // Address of the department.
-	@JsonIgnore
-	  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "department")
-	  private List<Employee> employee;
-
+	/*
+	 * @JsonIgnore
+	 * 
+	 * @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy =
+	 * "department") private List<Employee> employee;
+	 */
 }
