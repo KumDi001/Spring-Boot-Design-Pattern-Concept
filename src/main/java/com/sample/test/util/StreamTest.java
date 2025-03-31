@@ -2,6 +2,7 @@ package com.sample.test.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashSet;
@@ -16,7 +17,13 @@ import java.util.stream.Stream;
 
 import org.springframework.stereotype.Component;
 
+import com.sample.test.entity.Department;
+import com.sample.test.entity.Employee;
+
+import lombok.extern.log4j.Log4j2;
+
 @Component
+@Log4j2
 public class StreamTest {
 
 	// ArrayList----- sorting
@@ -115,8 +122,86 @@ public class StreamTest {
 			System.out.println(arr[x]);
 	}
 
+	public boolean isPrime(int number) {
+		if (number <= 1) {
+			return false;
+		}
+		for (int i = 2; i <= Math.sqrt(number); i++) {
+			if (number % i == 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public void streamPart1() {
+		Employee emp1 = new Employee();
+		emp1.setEmpId(1l);
+		emp1.setEmpName("Dilip Kumar");
+		emp1.setAge(30);
+		emp1.setPhone_no("9892154");
+
+		Department dep1 = new Department();
+		dep1.setDepartmentId(11l);
+		dep1.setDepartmentName("Computer Science");
+		dep1.setDepartmentAddress("Kolkata Gitanjali SEZ");
+
+		Department dep2 = new Department();
+		dep2.setDepartmentId(12l);
+		dep2.setDepartmentName("Social Science");
+		dep2.setDepartmentAddress("Kolkata Ecospace SEZ");
+
+		Department dep3 = new Department();
+		dep3.setDepartmentId(13l);
+		dep3.setDepartmentName("Information Technology");
+		dep3.setDepartmentAddress("Kolkata SEZ");
+
+		emp1.setDepartment(dep1);
+
+		Employee emp2 = new Employee();
+		emp2.setEmpId(2l);
+		emp2.setEmpName("Ram Kumar");
+		emp2.setAge(26);
+		emp2.setPhone_no("9865223");
+
+		emp2.setDepartment(dep2);
+
+		Employee emp3 = new Employee();
+		emp3.setEmpId(3l);
+		emp3.setEmpName("Ratan Kumar");
+		emp3.setAge(29);
+		emp3.setPhone_no("8965622");
+
+		emp3.setDepartment(dep3);
+
+		Employee emp4 = new Employee();
+		emp4.setEmpId(4l);
+		emp4.setEmpName("Rajesh Kumar");
+		emp4.setAge(25);
+		emp4.setPhone_no("89656256");
+
+		emp4.setDepartment(dep3);
+
+		List<Employee> emList = new ArrayList<>();
+		emList.add(emp1);
+		emList.add(emp2);
+		emList.add(emp3);
+		emList.add(emp4);
+		// Average Age
+		double averageAge = emList.stream().mapToInt(Employee::getAge).average().orElse(0);
+		log.info("Average Age of Employees {}", averageAge);
+		
+		emList.stream()
+				.mapToInt(Employee::getAge)
+				.anyMatch(this::isPrime);
+		List<Employee> emList1 = emList.stream()
+				.peek(e->System.out.println(e))
+		        .filter(emp->this.isPrime(emp.getAge()))
+		        .collect(Collectors.toList());
+
+	}
+
 	public void streamKT() {
-		int arr[] = new int[] { 1, 2, 3, 4 };
 		Vector<Integer> v = new Vector();
 		Hashtable<Integer, String> h = new Hashtable(); // sechronized
 		// Adding the elements into the
@@ -156,17 +241,23 @@ public class StreamTest {
 
 		students.add("Neeraj");
 		students.add("Sandeep");
-		Set<String> flt =  new LinkedHashSet<>();
-		long count = students.stream().map(e->e.toUpperCase()).count();
+		Set<String> flt = new LinkedHashSet<>();
+		long count = students.stream().map(e -> e.toUpperCase()).count();
 		System.out.println("Stream Opp" + count);
+
+		// longest String;
+		Optional<String> longestLength = students.stream().max(Comparator.comparingInt(String::length));
+		log.info("Longest String {}", longestLength.get());
+
 		// 5 ways to create Stream.
 		List<Integer> num = Arrays.asList(100, 220, 330, 400, 500);
 		List<Integer> filterList = num.stream().filter((Integer i) -> i < 400).collect(Collectors.toList());
 
 		Integer[] salary = { 30000, 40000, 30000, 50000 };
 		Stream<Integer> salaryStream = Arrays.stream(salary).sorted().skip(1).limit(2);
-		 salaryStream.collect(Collectors.toList()).forEach(e->System.out.println("nd and third max"+e));
-		double avg= salaryStream.mapToInt(x->x).summaryStatistics().getAverage();
+		 salaryStream.collect(Collectors.toList()).forEach(e -> System.out.println("nd and third max" + e));
+		double avg =  Arrays.stream(salary).mapToInt(x -> x)
+				.average().orElse(0);// summaryStatistics().getAverage();
 
 		// Static Method
 		Stream<Integer> salaryStream1 = Stream.of(30000, 40000, 30000, 50000);
