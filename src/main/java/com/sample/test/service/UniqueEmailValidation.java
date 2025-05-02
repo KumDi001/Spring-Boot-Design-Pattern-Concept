@@ -15,9 +15,14 @@ public class UniqueEmailValidation implements ConstraintValidator<UniqueEmailVal
 	@Override
 	public boolean isValid(String value, ConstraintValidatorContext context) {
 		// TODO Auto-generated method stub
-		if (employeeRepository.findByEmailAddress(value).size() == 0)
+		if (value == null) {
 			return true;
-		return false;
+		}
+
+		// Check if email already exists
+		var existingEmployee = employeeRepository.findByEmailAddress(value);
+		return existingEmployee == null; // true means it's unique
+
 	}
 
 }

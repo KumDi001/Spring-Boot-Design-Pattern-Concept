@@ -3,6 +3,7 @@ package com.sample.test.serviceImpl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -10,12 +11,380 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-
+import com.sample.test.service.ProducerService;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @Service
 public class Problems {
+
+	private final ProducerService producerService;
+
+	Problems(ProducerService producerService) {
+		this.producerService = producerService;
+	}
+
+	public static void main(String[] args) {
+		String str = "leet**cod*e";
+
+		char[] cList = str.toCharArray();
+		Stack<Character> stk = new Stack<>();
+
+		for (char c : cList) {
+
+			if (c == '*')
+				stk.pop();
+			else
+				stk.push(c);
+		}
+		System.out.println(stk.stream().map(st -> st.toString()).collect(Collectors.joining("")));
+
+		int[] asteroids = { 10, 2, -5 };
+
+		Stack<Integer> stack = new Stack<>();
+
+		for (int asteroid : asteroids) {
+			while (!stack.isEmpty() && asteroid < 0 && stack.peek() > 0) {
+				int top = stack.peek();
+
+				if (Math.abs(top) > Math.abs(asteroid)) {
+					// Right-moving asteroid survives, left asteroid is destroyed
+					asteroid = 0;
+				} else if (Math.abs(top) < Math.abs(asteroid)) {
+					// Left-moving asteroid survives, pop right asteroid
+					stack.pop();
+				} else {
+					// Both asteroids have the same size and destroy each other
+					stack.pop();
+					asteroid = 0;
+				}
+			}
+
+			// If asteroid is not destroyed, add it to the stack
+			if (asteroid != 0) {
+				stack.push(asteroid);
+			}
+			stack.stream().mapToInt(Integer::intValue).toArray(); // (Collectors.joining(""));
+		}
+		int[] nums = { 5, 2, 7, 1, 4 };
+		minimumPairRemoval(nums);
+
+		// int [] original= {1,2,3,4,5,6,7,8,9,12,34,56};
+		int[] nums1 = { 4, 5, 6, 7, 8, 9, 10, 13, 12, 34, 56, 1, 2, 3 }; // mid =6/2=3 rotated array on 4
+		System.out.println(nums1[rotatedArraySearch(nums1)]);
+
+		System.out.println(recursiveBinarySearch(nums1, 0, nums1.length - 1, 34));
+
+		bubbleSort(nums);
+		selectionSort(nums);
+		insertionSort(nums1);
+
+	}
+
+	static void bubbleSort(int[] arr) {
+
+		System.out.println("Before bubbleSort");
+		for (int i : arr) {
+			System.out.print(i);
+		}
+		System.out.println();
+		int swap;
+		for (int i = 0; i < arr.length; i++) {
+			swap = 0;
+			for (int j = 0; j < arr.length - 1 - i; j++) {
+				if (arr[j] > arr[j + 1]) {
+					// Swap
+					int temp = arr[j];
+					arr[j] = arr[j + 1];
+					arr[j + 1] = temp;
+					swap++;
+				}
+			}
+			for (int x : arr) {
+				System.out.print(x);
+			}
+			System.out.println("Swap::" + swap);
+		}
+		System.out.println("After bubbleSort");
+		for (int i : arr) {
+			System.out.print(i);
+		}
+
+	}
+
+	static void selectionSort(int[] arr) {
+
+		// int[] nums1 = { 4, 5, 6, 7, 8, 9, 12, 34, 56, 1, 2, 3 };
+		System.out.println();
+		System.out.println("Before selectionSort");
+		for (int i : arr) {
+			System.out.print(i);
+		}
+		System.out.println();
+		int swap = 0;
+		int minIndex = -1;
+		for (int i = 0; i < arr.length; i++) {
+			minIndex = i;
+			for (int j = i + 1; j < arr.length; j++) {
+				if (arr[minIndex] > arr[j]) {
+					minIndex = j;
+				}
+			}
+
+			int temp = arr[i];
+			arr[i] = arr[minIndex];
+			arr[minIndex] = temp;
+			swap++;
+			for (int x : arr) {
+				System.out.print(x);
+			}
+			System.out.println("Swap::" + swap);
+		}
+		System.out.println("After selectionSort");
+		for (int i : arr) {
+			System.out.print(i);
+		}
+
+	}
+
+	static void insertionSort(int[] arr) {
+
+		// int[] nums1 = { 4, 5, 6, 10, 11, 7, 8, 9, 12, 34, 56, 1, 2, 3 };
+		System.out.println();
+		System.out.println("Before insertionSort");
+		for (int i : arr) {
+			System.out.print(i);
+		}
+		System.out.println();
+		int j;
+		int key;
+		for (int i = 1; i < arr.length; i++) {
+			j = i - 1;
+			key = arr[i];
+			while (j >= 0 && arr[j] > key) {
+				arr[j + 1] = arr[j];
+				j--;
+			}
+			arr[j + 1] = key;
+
+		}
+		System.out.println("After insertionSort");
+		for (int i : arr) {
+			System.out.print(i);
+		}
+
+	}
+
+	public static int rotatedArraySearch(int[] nums1) {
+
+		int index = getPivot(nums1, 0, nums1.length - 1);
+		int found = binarySearch(nums1, 0, index, 9);
+		if (found == -1)
+			found = binarySearch(nums1, index, nums1.length - 1, 9);
+		return found;
+	}
+
+	public static int getPivot(int[] arr, int left, int right) {
+		while (left <= right) {
+			int mid = (left + right) / 2;
+			if (arr[mid] > arr[mid + 1])
+				return mid;
+			else if (arr[mid] < arr[mid - 1])
+				return mid - 1;
+			else if (arr[mid] > arr[left])
+				left = mid + 1;
+			else
+				right = mid - 1;
+
+		}
+		return right;
+	}
+
+	public static int binarySearch(int[] arr, int left, int right, int key) {
+
+		// 10,4,9,7,2,5,6, mid =6/2=3
+		// key 9
+		while (left <= right) {
+			int mid = (left + right) / 2;
+			if (key > arr[mid])
+				left = mid + 1;
+			else if (arr[mid] == key)
+				return mid;
+			else
+				right = mid - 1;
+
+		}
+
+		return -1;
+
+	}
+
+	public static int recursiveBinarySearch(int[] arr, int left, int right, int key) {
+
+		// 10,4,9,7,2,5,6, mid =6/2=3
+		// key 9
+		if (left <= right) {
+			int mid = (left + right) / 2;
+			if (key > arr[mid])
+				return recursiveBinarySearch(arr, mid + 1, right, key);
+			else if (arr[mid] == key)
+				return mid;
+			else
+				return recursiveBinarySearch(arr, left, mid - 1, key);
+		}
+		return -1;
+	}
+
+	public static int minimumPairRemoval(int[] nums) {
+		// [5 2 7 1]
+		List<Integer> list = Arrays.stream(nums).boxed().collect(Collectors.toList());
+
+		int count = 0;
+		while (!isIncreasing(list)) {
+
+			int minSum = Integer.MAX_VALUE;
+			int indexToMerge = -1;
+
+			for (int i = 0; i < list.size() - 1; i++) {
+				int sum = list.get(i) + list.get(i + 1);
+				if (sum < minSum) {
+					minSum = sum;
+					indexToMerge = i;
+				}
+			}
+			int toMergeValue = list.get(indexToMerge) + list.get(indexToMerge + 1);
+			list.remove(indexToMerge + 1);
+			list.set(indexToMerge, toMergeValue);
+			count++;
+		}
+
+		return count;
+	}
+
+	private static boolean isIncreasing(List<Integer> nums) {
+		for (int i = 0; i < nums.size() - 1; i++) {
+			if (nums.get(i) > nums.get(i + 1))
+				return false;
+		}
+		return true;
+	}
+
+	public int compress(char[] chars) {
+
+		List<Character> result = new ArrayList<>();
+		result.add(chars[0]);
+		int count = 1;
+		for (int i = 0; i < chars.length - 1; i++) {
+			if (chars[i] == chars[i + 1]) {
+				count++;
+			} else {
+				if (count >= 10) {
+					String numberString = Integer.toString(count);
+					for (int j = 0; j < numberString.length(); j++) {
+						result.add(numberString.charAt(j));
+					}
+				} else
+					result.add(String.valueOf(count).toCharArray()[0]);
+
+				count = 1;
+				result.add(chars[i + 1]);
+			}
+			if ((chars[i] == chars[i + 1]) && (i + 1 == chars.length - 1)) {
+				if (count >= 10) {
+					String numberString = Integer.toString(count);
+					for (int j = 0; j < numberString.length(); j++) {
+						result.add(numberString.charAt(j));
+					}
+				} else
+					result.add(String.valueOf(count).toCharArray()[0]);
+			}
+		}
+		return result.size();
+	}
+
+	public String reverseVowels(String s) {
+		char[] cList = s.toCharArray();
+		int left = 0;
+		int right = s.length() - 1;
+		boolean flag = false;
+		boolean flag1 = false;
+		for (int x = 0; x < s.length(); x++) {
+			for (int i = left; i <= right; i++) {
+				if (s.charAt(i) == 'a' || s.charAt(i) == 'e' || s.charAt(i) == 'i' || s.charAt(i) == 'o'
+						|| s.charAt(i) == 'u' || s.charAt(i) == 'A' || s.charAt(i) == 'E' || s.charAt(i) == 'I'
+						|| s.charAt(i) == 'O' || s.charAt(i) == 'U') {
+					flag = true;
+					break;
+				} else
+					left++;
+			}
+
+			for (int i = right; i > left; i--)
+				if (s.charAt(i) == 'a' || s.charAt(i) == 'e' || s.charAt(i) == 'i' || s.charAt(i) == 'o'
+						|| s.charAt(i) == 'u' || s.charAt(i) == 'A' || s.charAt(i) == 'E' || s.charAt(i) == 'I'
+						|| s.charAt(i) == 'O' || s.charAt(i) == 'U') {
+					flag1 = true;
+					break;
+				} else
+					right--;
+			if (left < right && flag && flag1) {
+				char temp = cList[left];
+				cList[left] = cList[right];
+				cList[right] = temp;
+				left++;
+				right--;
+				flag = false;
+			}
+		}
+		return String.valueOf(cList);
+
+	}
+
+	public boolean uniqueOccurrences(int[] arr) {
+		Map<Integer, Long> countMap = Arrays.stream(arr).boxed()
+				.collect(Collectors.groupingBy(n -> n, Collectors.counting()));
+
+		// Check if all counts are equal
+		boolean allEqual = countMap.values().stream().distinct().count() == 1;
+
+		// Check if all counts are unique
+		boolean allUnique = countMap.values().stream().distinct().count() == countMap.values().size();
+		return allUnique;
+	}
+
+	public String mergeAlternately(String word1, String word2) {
+		char[] cList1 = word1.toCharArray();
+		char[] cList2 = word2.toCharArray();
+		int n1 = cList1.length;
+		int n2 = cList2.length;
+		char[] result = new char[n1 + n2];
+		int i = 0;
+		int j = 0;
+		int x = 0;
+		while (x < n1 + n2) {
+			if (i < n1 && j < n2) {
+				result[x] = cList1[i];
+				x++;
+				result[x] = cList2[j];
+				x++;
+				i++;
+				j++;
+			} else if (n1 < n2) {
+				while (j < n2) {
+					result[x] = cList2[j];
+					x++;
+					j++;
+				}
+			} else {
+				while (i < n1) {
+					result[x] = cList1[i];
+					x++;
+					i++;
+				}
+			}
+		}
+		return String.valueOf(result);
+	}
 
 	public int maxProduct(int[] nums) {
 
@@ -39,10 +408,8 @@ public class Problems {
 
 		Map<Integer, Long> map = Arrays.stream(nums).boxed()
 				.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-		for(Map.Entry<Integer,Long> key :map.entrySet())
-		{
-			if(key.getValue()>=2)
-			{
+		for (Map.Entry<Integer, Long> key : map.entrySet()) {
+			if (key.getValue() >= 2) {
 				return true;
 			}
 		}
