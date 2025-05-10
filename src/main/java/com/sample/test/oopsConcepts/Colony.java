@@ -1,7 +1,5 @@
 package com.sample.test.oopsConcepts;
 
-import java.io.Serializable;
-
 import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;

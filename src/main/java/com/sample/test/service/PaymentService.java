@@ -3,15 +3,15 @@ package com.sample.test.service;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class PaymentService {
-	
+
 	@Autowired
 	OrderService orderserv;
-	public String getOrderEventsFromOrderService() 
-	{
+
+	public String getOrderEventsFromOrderService() {
 		return orderserv.orderconfirm(getOrderEventsFromOrderService());
 	}
-	public void processPayment()
-	{
+
+	public void processPayment() {
 		getOrderEventsFromOrderService();
 		System.out.println();
 	}

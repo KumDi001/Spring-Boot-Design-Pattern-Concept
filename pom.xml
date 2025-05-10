@@ -177,6 +177,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>practice-demo</finalName>
 	</build>
 
 </project>

@@ -36,7 +36,7 @@ public class Employee {
 	private String empAddress; // Address of the department
 
 	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "departmentId", nullable = false)
+	@JoinColumn(name = "department_id", nullable = false)
 	@JsonIgnore
 	private Department department;
 

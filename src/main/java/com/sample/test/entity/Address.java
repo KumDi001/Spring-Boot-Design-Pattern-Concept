@@ -1,12 +1,14 @@
 package com.sample.test.entity;
 
-import com.sample.test.service.Colony;
+import java.util.List;
 
-public class Address implements Colony {
-	@Override
-	public void testme() {
-		System.out.println("Address Method");
-	}
+import lombok.Data;
+
+@Data
+public class Address  {
+	
+	List<Block> block;
+	int address_id;
 	public static int counter = 0;
 	    public Address() {
 	       counter = 20;

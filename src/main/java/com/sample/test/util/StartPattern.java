@@ -1,4 +1,4 @@
-package com.sample.test.service;
+package com.sample.test.util;
 
 public class StartPattern {
 

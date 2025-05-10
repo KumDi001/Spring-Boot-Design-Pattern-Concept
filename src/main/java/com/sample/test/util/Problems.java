@@ -1,11 +1,13 @@
-package com.sample.test.serviceImpl;
+package com.sample.test.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -78,7 +80,173 @@ public class Problems {
 		bubbleSort(nums);
 		selectionSort(nums);
 		insertionSort(nums1);
+		// QuickSort()
+		// MergeSort()
+		String k = "KPMG";
+		permute(k, 0, k.length() - 1);
+		String[] input = { "eat", "tea", "tan", "ate", "nat", "bat" };
+		groupAnagrams(input);
+		System.out.println(myAtoi("167887"));
+		System.out.println(lengthOfLongestSubstring("abcaabcbb")); // Output: 3 ("abc")
+		System.out.println(Arrays.toString(twoSum1(new int[] { 2, 7, 11, 15 }, 13))); // Output: [0, 1]
+		System.out.println(containsDuplicate(new int[] { 1, 2, 3, 1 })); // Output: true
+		System.out.println(maxProfit(new int[] { 7, 3, 5, 3, 2, 6, 14 })); // Output: 5
+		System.out.println(Arrays.toString(productExceptSelf(new int[] { 1, 2, 3, 4 }))); // Output: [24,12,8,6]
+		System.out.println(maxSubArray(new int[] { -2, 1, -3, 4, -1, 2, 1, -5, 4 })); // Output: 6
+		int[] arr = { 0, 1, 0, 3, 12 };
+		moveZeroes(arr);
+		System.out.println(Arrays.toString(arr)); // Output: [1,3,12,0,0]
 
+		int[] arr1 = { 1, 2, 3, 4, 5, 6, 7 };
+		rotate(arr1, 3);
+		System.out.println(Arrays.toString(arr)); // Output: [5,6,7,1,2,3,4]
+		System.out.println(missingNumber(new int[] { 3, 2, 1, 5 })); // Output: 1
+
+	}
+
+	public static int maxSubArray(int[] nums) {
+		int maxSoFar = nums[0], curr = nums[0];
+		for (int i = 1; i < nums.length; i++) {
+			curr = Math.max(nums[i], curr + nums[i]);
+			maxSoFar = Math.max(maxSoFar, curr);
+		}
+		return maxSoFar;
+	}
+
+	public static void moveZeroes(int[] nums) {
+		int index = 0;
+		for (int num : nums) {
+			if (num != 0)
+				nums[index++] = num;
+		}
+		while (index < nums.length)
+			nums[index++] = 0;
+	}
+
+	public static void rotate(int[] nums, int k) {
+
+		int index = 0;
+
+		// { 1, 2, 3, 4, 5, 6, 7 }; //Output: [5,6,7,1,2,3,4]
+		int[] nums1 = new int[k + 1];
+		for (int i = 0; i <= k; i++)
+			nums1[i] = nums[i];
+
+		for (int i = k + 1; i < nums.length; i++)
+			nums[index++] = nums[i];
+		int copy = 0;
+		while (index < nums.length) {
+			nums[index++] = nums1[copy];
+			copy++;
+		}
+	}
+
+	public static int missingNumber(int[] nums) {
+
+		// System.out.println(missingNumber(new int[]{3,2,4,0,1})); // Output: 1
+		int n = nums.length + 1;// if zero is there then n=nums.length only
+		int sum = n * (n + 1) / 2;
+		int res = 0;
+		for (int i : nums)
+			res = res + i;
+		return sum - res;
+
+	}
+
+	private static void reverse(int[] nums, int start, int end) {
+		while (start < end) {
+			int tmp = nums[start];
+			nums[start++] = nums[end];
+			nums[end--] = tmp;
+		}
+	}
+
+	public static int maxProfit(int[] prices) {
+		int min = Integer.MAX_VALUE, profit = 0;
+		for (int price : prices) {
+			min = Math.min(min, price);
+			profit = Math.max(profit, price - min);
+		}
+
+		return profit;
+	}
+
+	public static int[] productExceptSelf(int[] nums) {
+		int n = nums.length;
+		int[] res = new int[n];
+		int left = 0, right = n - 1, prod = 1;
+
+		for (int i = 0; i < n; i++) {
+			// left
+			prod = 1;
+			for (int j = i - 1; j >= left; j--) {
+				prod *= nums[j];
+			}
+			// right
+			for (int x = i + 1; x <= right; x++) {
+				prod *= nums[x];
+			}
+			res[i] = prod;
+		}
+		return res;
+	}
+
+	public static int[] twoSum1(int[] nums, int target) {
+		Map<Integer, Integer> map = new HashMap<>();
+		for (int i = 0; i < nums.length; i++) {
+			int complement = target - nums[i];
+			if (map.containsKey(complement)) {
+				return new int[] { map.get(complement), i };
+			}
+			map.put(nums[i], i);
+		}
+		return new int[] {};
+	}
+
+	public static boolean containsDuplicate(int[] nums) {
+		Set<Integer> seen = new HashSet<>();
+		for (int num : nums) {
+			if (!seen.add(num))
+				return true;
+		}
+		return false;
+	}
+
+	public static List<List<String>> groupAnagrams(String[] strs) {
+		Map<String, List<String>> map = new HashMap<>();
+		for (String s : strs) {
+			char[] chars = s.toCharArray();
+			Arrays.sort(chars);
+			String key = new String(chars);
+			// map.computeIfAbsent(key, k -> new ArrayList<>()).add(s);
+			if (!map.containsKey(key))
+				map.put(key, new ArrayList<>());
+			map.get(key).add(s);
+		}
+		return new ArrayList<>(map.values());
+	}
+
+	public static int myAtoi(String s) {
+		// String s= "1989";
+		s = s.trim();
+		if (s.isEmpty())
+			return 0;
+		int i = Integer.valueOf(s);
+		return i;
+	}
+
+	public static int lengthOfLongestSubstring(String s) {
+		Set<Character> set = new HashSet<>();
+		int left = 0, maxLen = 0;
+
+		for (int right = 0; right < s.length(); right++) {
+			while (set.contains(s.charAt(right))) {
+				set.remove(s.charAt(left++));
+			}
+			set.add(s.charAt(right));
+			maxLen = Math.max(maxLen, right - left + 1);
+		}
+		return maxLen;
 	}
 
 	static void bubbleSort(int[] arr) {
@@ -195,7 +363,6 @@ public class Problems {
 				left = mid + 1;
 			else
 				right = mid - 1;
-
 		}
 		return right;
 	}
@@ -404,7 +571,7 @@ public class Problems {
 
 	}
 
-	public boolean containsDuplicate(int[] nums) {
+	public boolean containsDuplicate1(int[] nums) {
 
 		Map<Integer, Long> map = Arrays.stream(nums).boxed()
 				.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
@@ -688,6 +855,33 @@ public class Problems {
 				}
 			}
 		}
+	}
+
+	public static void permute(String str, int start, int end) {
+		// Base case
+		if (start == end)
+			System.out.println(str);
+		else {
+			// Permutations performed
+			for (int i = start; i <= end; i++) {
+
+				// Switching performed
+				swap(str.charAt(start), str.charAt(i));
+
+				// Recursion called
+				permute(str, start + 1, end);
+
+				// backtrack
+				swap(str.charAt(start), str.charAt(i));
+			}
+		}
+	}
+
+	public static void swap(char c1, char c2) {
+		char temp = c1;
+		c1 = c2;
+		c2 = temp;
+
 	}
 
 }

@@ -2,9 +2,11 @@ package com.sample.test.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -12,19 +14,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.Vector;
 import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.comparator.Comparators;
 
+import com.sample.test.entity.Address;
+import com.sample.test.entity.Block;
 import com.sample.test.entity.Department;
 import com.sample.test.entity.Employee;
+import com.sample.test.oopsConcepts.Colony;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -34,11 +38,66 @@ public class StreamTest {
 
 	public static void main(String[] args) {
 
+		List<Address> addressList = new ArrayList<>();
+		List<Block> blocks = new ArrayList<>();
+		blocks.add(new Block(123));
+		blocks.add(new Block(123));
+		blocks.add(new Block(223));
+		blocks.add(new Block(442));
+		blocks.add(new Block(123));
+		Address address = new Address();
+		address.setBlock(blocks);
+		address.setAddress_id(1);
+
+		Address address2 = new Address();
+		address2.setBlock(Arrays.asList(new Block(123)));
+		address2.setAddress_id(2);
+
+		addressList.add(address);
+		addressList.add(address2);
+
+		long count = addressList.stream().map(a -> a.getBlock()).flatMap(b -> b.stream())
+				.filter(b -> b.getBlock_id() == 123).count();
+
+		//
+		Map<Address, List<Block>> addMapList = addressList.stream()
+				.collect(Collectors.toMap(Function.identity(), a -> a.getBlock()));
+
+		long count1 = addMapList.entrySet().stream().map(k -> k.getValue()).flatMap(List::stream)
+				.filter(x -> x.getBlock_id() == 123).count();
+
+		String str1 = "abc";
+
+		int len = str1.length();
+		List<String> n = IntStream.range(0, len).boxed()
+				.flatMap(i -> IntStream.range(i + 1, len + 1).mapToObj(j -> str1.substring(i, j)))
+				.collect(Collectors.toList());
+
+		// if block id 123 return all block count with block id 123
+
 		// 1.Question: Given a list of integers, use the Stream API to find the sum of
 		// all even numbers in the list.
-		List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
-		numbers.stream().filter(n -> n % 2 == 0).collect(Collectors.summarizingInt(a -> a)).getSum();
+		List<Integer> numbers = Arrays.asList(1, 2, 4, 5, 6, 8, 9);
+		List<Integer> stream = Stream.iterate(1, i -> i + 1).limit(numbers.size() + 2).toList();
+		Set<Integer> set1 = new HashSet<>(numbers);
+		List<Integer> result = stream.stream().filter(i -> !set1.contains(i)).collect(Collectors.toList());
+		System.out.println(result);
+		List<Integer> nResult = new ArrayList<>();
+		Collections.sort(numbers);
+		int j = 1;
+		for (int i = 0; i < numbers.size(); i++) {
 
+			if (numbers.get(i) != j) {
+				nResult.add(j);
+				j++;
+			}
+			j++;
+		}
+
+		OptionalInt max = numbers.stream().filter(n1 -> n1 % 2 == 0).mapToInt(a -> a.intValue()).max();// .collect(Collectors.summarizingInt(a
+																										// ->
+																										// a)).getSum();
+		max.getAsInt();
 //		System.out.println(numbers.stream().filter(n -> n % 2 == 0).collect(Collectors.summarizingInt(a -> a)).getAverage());
 		// Find the longest string from a list of strings using the Stream API.
 		List<String> words = Arrays.asList("apple", "banana", "cherry", "blueberry", "apple");
@@ -77,7 +136,7 @@ public class StreamTest {
 		System.out.println(charsLIst);
 
 		String reversed = new StringBuilder(str).reverse().toString();
-		
+
 		final ArrayList<String> list = new ArrayList<>();
 		list.add("Hello");
 		list.add("World");
@@ -105,38 +164,37 @@ public class StreamTest {
 		 * Integer.compare(b.getAge(), a.getAge())) .collect(Collectors.toList()));
 		 */
 
-		Map<Integer, Employee> mapList = empList.stream().collect(Collectors.toMap(e -> e.getAge(), e -> e));
+		Map<Integer, Employee> mapList1 = empList.stream().collect(Collectors.toMap(e -> e.getAge(), e -> e));
 		System.out.println("Sorted List");
-		System.out.println(mapList.entrySet().stream()
-				.sorted((a, b) -> Integer.compare(b.getValue().getSalary(), a.getValue().getSalary()))
-				.collect(Collectors.toMap(k -> k.getKey(), v -> v.getValue())));
-
+		/*
+		 * System.out.println(mapList.entrySet().stream()
+		 * .sorted(Map.Entry.comparingByValue((a,b)->Integer.compare(a.getSalary(),
+		 * b.getSalary()))) .collect(Collectors.toMap(k -> k, v -> v,(a,b)->a,
+		 * LinkedHashMap::new )));
+		 */
 		streamProblems();
 		List<Integer> shiftOne = Arrays.asList(1, 2, 3, 4, 1, 5, 6, 1, 7, 8, 1, 9);
 
 		System.out.println(shiftOne.stream().sorted((a, b) -> Integer.compare(b, a)).collect(Collectors.toList()));
 
 		long countof1 = shiftOne.stream().filter(num -> num == 1).count();
-		List<Integer> list2 = new ArrayList<>();
+		List<Integer> one = new ArrayList<>();
 		for (int i = 0; i < countof1; i++)
-			list2.add(1);
+			one.add(1);
 		List<Integer> notOne = shiftOne.stream().filter(num -> num != 1).collect(Collectors.toList());
-		Stream.concat(list2.stream(), notOne.stream()).collect(Collectors.toList()).forEach(e -> System.out.print(e));
-		
+		Stream.concat(one.stream(), notOne.stream()).collect(Collectors.toList()).forEach(e -> System.out.print(e));
+
 		List<String> sList = Arrays.asList("1", "2", "3", "4", "5");
 
-		// Using Stream flatMapToInt(Function mapper) 
+		// Using Stream flatMapToInt(Function mapper)
 		System.out.println("Using Map");
-		sList.stream().map(i->Integer.parseInt(i)).forEach(i->System.out.println(i));
-		
+		sList.stream().map(i -> Integer.parseInt(i)).forEach(i -> System.out.println(i));
+
 		System.out.println("Using FlatMap");
-		sList.stream()
-		.flatMapToInt(num -> IntStream.of(Integer.parseInt(num)))
-		.forEach(System.out::println);
-		
+		sList.stream().flatMapToInt(num -> IntStream.of(Integer.parseInt(num))).forEach(System.out::println);
+
 		streamKT();
 	}
-
 	// ArrayList----- sorting
 
 	// [6,2,8,9,3]..pivot(can be last, first, Mode and any random value from the
@@ -299,7 +357,7 @@ public class StreamTest {
 		emList.add(emp3);
 		emList.add(emp4);
 		// Average Age
-		double averageAge = emList.stream().mapToInt(Employee::getAge).average().orElse(0);
+		double averageAge = emList.stream().mapToInt(e -> e.getAge()).average().orElse(0);
 		log.info("Average Age of Employees {}", averageAge);
 
 		emList.stream().mapToInt(Employee::getAge).anyMatch(StreamTest::isPrime);
@@ -353,7 +411,7 @@ public class StreamTest {
 		System.out.println("Stream Opp" + count);
 
 		// longest String;
-		Optional<String> longestLength = students.stream().max((a,b)->Integer.compare(a.length(), b.length()));
+		Optional<String> longestLength = students.stream().max((a, b) -> Integer.compare(a.length(), b.length()));
 		log.info("Longest String {}", longestLength.get());
 
 		// 5 ways to create Stream.
@@ -363,9 +421,7 @@ public class StreamTest {
 		int[] salary = { 30000, 40000, 30000, 50000 };
 		Stream<Integer> salaryStream = Arrays.stream(salary).boxed().sorted().skip(1).limit(2);
 		salaryStream.collect(Collectors.toList()).forEach(e -> System.out.println("nd and third max" + e));
-		double avg = Arrays.stream(salary).boxed()
-				.mapToInt(x -> x)
-				.sum();
+		double avg = Arrays.stream(salary).boxed().mapToInt(x -> x).sum();
 
 		// Static Method
 		Stream<Integer> salaryStream1 = Stream.of(30000, 40000, 30000, 50000);
@@ -397,12 +453,11 @@ public class StreamTest {
 
 		// Sorted()
 		// Stream<String> streamSorted = streamStud.distinct().sorted();
-		Stream<Integer> streamSortedDesc = salaryStream1.distinct().sorted(( str1,  str2) -> str1 - str2);
+		Stream<Integer> streamSortedDesc = salaryStream1.distinct().sorted((str1, str2) -> str1 - str2);
 
 		// peek()
 
-		Stream<Integer> peekStream = test.stream().filter(i -> i > 200)
-				.peek(i-> System.out.println(i));
+		Stream<Integer> peekStream = test.stream().filter(i -> i > 200).peek(i -> System.out.println(i));
 		// List<Integer> peekList = peekStream.collect(Collectors.toList());
 
 		// MaptoInt()
@@ -463,17 +518,17 @@ public class StreamTest {
 			System.out.println("sList toArray" + it);
 		}
 		// reduce()
-		Integer reducedList = sortedList.stream().filter((Integer i) -> i < 200)
-				.reduce(0,(Integer i, Integer j) -> i + j);
+		Integer reducedList = sortedList.stream().filter((Integer i) -> i < 200).reduce(0,
+				(Integer i, Integer j) -> i + j);
 
 		System.out.println("Reduced Value " + reducedList);
 
 		// collect()
-		List<Integer> collectTerminate = sortedList.stream().map((Integer i) -> i * 2).collect(Collectors.toList());
-		Optional<Integer> minOfList1 = collectTerminate.stream().min((Integer i, Integer j) -> i - j);
+		List<Integer> collectTerminate = sortedList.stream().map((i) -> i * 2).collect(Collectors.toList());
+		Integer minOfList1 = collectTerminate.stream().min((i, j) -> i - j).get();
 		System.out.println("Min () value of List " + minOfList1);
 
-		Optional<Integer> minOfList2 = collectTerminate.stream().min((Integer i, Integer j) -> j - i);
+		Integer minOfList2 = collectTerminate.stream().min((i, j) -> j - i).get();
 		System.out.println("Min () value of List " + minOfList2);
 
 		int[] arrT = { 1, 2, 3, 4, 5 };
@@ -665,11 +720,10 @@ public class StreamTest {
 
 		List<Employee> persons = Arrays.asList(employee, employee0, employee1, employee2, employee3);
 
-		Map<String, Employee> empMap = persons.stream()
-				.collect(Collectors.toMap(e -> e.getPhone_no(), emp -> emp));
+		Map<String, Employee> empMap = persons.stream().collect(Collectors.toMap(e -> e.getPhone_no(), emp -> emp));
 
 		Map<String, Employee> empMapSorted = empMap.entrySet().stream()
-				.sorted(Map.Entry.comparingByValue((a,b)->Integer.compare(a.getAge(), b.getAge())))
+				.sorted(Map.Entry.comparingByValue((a, b) -> Integer.compare(a.getAge(), b.getAge())))
 				.collect(Collectors.toMap(e -> e.getKey(), v -> v.getValue(), (a, b) -> a, LinkedHashMap::new));
 
 		System.out.println("Sorted List By Age" + empMapSorted);
@@ -692,7 +746,7 @@ public class StreamTest {
 		List<Integer> primeNumbers = numbers.stream().peek(n -> System.out.println(n)).filter(num -> isPrime(num))
 				.collect(Collectors.toList());
 
-		boolean havePrimeNum = numbers.stream().anyMatch(n->isPrime1(n));
+		boolean havePrimeNum = numbers.stream().anyMatch(n -> isPrime1(n));
 		System.out.println(primeNumbers + "\t" + havePrimeNum);
 
 		///////////////////////////////
@@ -766,24 +820,23 @@ public class StreamTest {
 
 		System.out.println("Person" + persons);
 
-		Map<Integer, Employee> map = persons.stream()
-					.sorted(Comparator.comparingInt(p->p.getSalary()))
-					//.sorted((a, b) -> Integer.compare(b.getSalary(), a.getSalary()))
-					.collect(Collectors.toMap(emp -> emp.getAge(), // keys()
+		Map<Integer, Employee> map = persons.stream().sorted(Comparator.comparingInt(p -> p.getSalary()))
+				// .sorted((a, b) -> Integer.compare(b.getSalary(), a.getSalary()))
+				.collect(Collectors.toMap(emp -> emp.getAge(), // keys()
 						emp -> emp, // values()
 						(old, new1) -> old, // avoid duplicates()
 						() -> new LinkedHashMap<>())// preserve the order;
 				);
-					
-		HashMap<Object, Object> salarySorted= map.entrySet().stream()
+
+		HashMap<Object, Object> salarySorted = map.entrySet().stream()
 				.sorted(Map.Entry.comparingByValue(Comparator.comparingInt(Employee::getSalary).reversed()))
-				.collect(Collectors.toMap(key->key.getKey(), // keys()
+				.collect(Collectors.toMap(key -> key.getKey(), // keys()
 						val -> val.getValue(), // values()
 						(old, new1) -> old, // avoid duplicates()
 						() -> new LinkedHashMap<>()));
-		 System.out.println("salarySorted :::"); 
-		 System.out.println(salarySorted);
-		
+		System.out.println("salarySorted :::");
+		System.out.println(salarySorted);
+
 		System.out.println("MapToWorkSortedOnAddress");
 		System.out.println(map);
 

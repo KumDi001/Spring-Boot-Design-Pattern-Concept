@@ -21,7 +21,7 @@ import com.sample.test.factory.AndroidDeveloperFactory;
 import com.sample.test.factory.EmployeeFactory;
 import com.sample.test.factory.WebDeveloperFactory;
 import com.sample.test.oopsConcepts.OopConcepts;
-import com.sample.test.serviceImpl.Problems;
+import com.sample.test.util.Problems;
 import com.sample.test.util.StreamTest;
 
 import lombok.extern.log4j.Log4j2;
