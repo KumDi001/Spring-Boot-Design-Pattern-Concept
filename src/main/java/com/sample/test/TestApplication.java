@@ -1,14 +1,13 @@
 package com.sample.test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 import org.springframework.boot.SpringApplication;
@@ -17,12 +16,12 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import com.sample.test.entity.Address;
 import com.sample.test.entity.Employees;
 import com.sample.test.factory.AndroidDeveloperFactory;
 import com.sample.test.factory.EmployeeFactory;
 import com.sample.test.factory.WebDeveloperFactory;
-import com.sample.test.serviceImpl.Problems;
+import com.sample.test.oopsConcepts.OopConcepts;
+import com.sample.test.util.Problems;
 import com.sample.test.util.StreamTest;
 
 import lombok.extern.log4j.Log4j2;
@@ -33,10 +32,14 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class TestApplication {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException, CloneNotSupportedException {
 		final ConfigurableApplicationContext context = SpringApplication.run(TestApplication.class, args);
 		Problems prob = (Problems) context.getBean("problems");
-
+		
+		OopConcepts oops= (OopConcepts) context.getBean("oopConcepts");		
+		char [] chars = {'a','a','a','b','b','b','b','b','b','b','b','b','b','b','b','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c'};
+		prob.compress(chars);
+		prob.reverseVowels("IceCreAm");
 		int[] nums = { 0, 1, 0, 3, 12 };
 		int count1 = 0;
 		for (int i = 0; i < nums.length - 1 - count1; i++) {
@@ -58,9 +61,16 @@ public class TestApplication {
 			}
 		}
 
-		Address y = new Address();
-		System.out.println(y.counter); // L5.
+		prob.mergeAlternately("abc", "pqrst");
+		
+		
+		/*
+		 * y.builder().address_id(1).build(); System.out.println(y.getAddress_id()); //
+		 * L5.
+		 */		
+		
 		// Factory call from the client
+		
 		Employees emp = EmployeeFactory.getEmployee("Android Developer");
 		emp.getSalary();
 		Employees emp1 = EmployeeFactory.getEmployee("Web Developer");
@@ -71,10 +81,14 @@ public class TestApplication {
 
 		Employees e4 = EmployeeFactory.getEmployees(new WebDeveloperFactory());
 		e4.getSalary();
+		
 		int[] prod = { -2, 3, -4 };
 		prob.maxProduct(prod);
 
 		int[] numsb2 = { 4, 4, 1, 3, 1, 3, 2, 2, 5, 5, 1, 5, 2, 1, 2, 3, 5, 4 };
+		List<Integer> numlist = new ArrayList<>();
+		for(int i:nums)
+			numlist.add(i);
 		int nx = numsb2.length;
 		int index = 0;
 		int result = 0;
@@ -106,6 +120,11 @@ public class TestApplication {
 	        List<Integer> list= Arrays.stream(nums).boxed().toList();     
 
 	        int [] numbers= {4,0,4,3,3};
+			/*
+			 * OptionalDouble avg=
+			 * Arrays.stream(numbers).boxed().mapToDouble(e->e).average();
+			 * System.out.println(avg.getAsDouble());
+			 */
 	        double avgMax= IntStream.range(0, numbers.length - 4 + 1)
 	            .mapToDouble(i -> Arrays.stream(Arrays.copyOfRange(numbers, i, i + 4))
 	            		.average()
@@ -132,7 +151,7 @@ public class TestApplication {
 		               break;
 	        }
 	        
-		final AtomicInteger counter = new AtomicInteger(0);
+		final AtomicInteger  counter = new AtomicInteger(0);
 		System.out.println(
 				"**************** START: Total Bean Objects:  ******************" + context.getBeanDefinitionCount());
 
@@ -142,6 +161,8 @@ public class TestApplication {
 
 		StreamTest streamService = (StreamTest) context.getBean("streamTest");
 		streamService.streamKT();
+		
+		streamService.streamProblems();		
 
 		int[] arrQuick = { 6, 2, 8, 9, 3 };
 		streamService.quickSort(arrQuick, 0, arrQuick.length - 1);

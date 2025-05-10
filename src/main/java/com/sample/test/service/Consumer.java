@@ -3,6 +3,12 @@ package com.sample.test.service;
 import org.springframework.stereotype.Service;
 
 @Service
-public class Consumer {
+public class Consumer implements Colony {
+
+	@Override
+	public void testme() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
